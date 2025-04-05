@@ -12,6 +12,12 @@ const gridWrapper = document.getElementById('grid-wrapper');
 const donePopUp = document.getElementById(`done-pop-up`);
 const loadIcon = document.getElementById(`load-icon`);
 
+// Auto-scroll state
+let isAutoScrollEnabled = false;
+let autoScrollSpeed = 0;
+const AUTO_SCROLL_INCREMENT = 2; // Reduced increment for finer control
+let autoScrollAnimationFrame = null;
+
 // Zoom and pan controls
 let panZoomInstance = panzoom(zoomPanHolder);
 panZoomInstance.dispose();

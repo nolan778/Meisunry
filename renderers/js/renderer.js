@@ -339,6 +339,26 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+// Add keyboard event listeners for auto-scroll control
+document.addEventListener('keydown', (event) => {
+  if (event.altKey) {
+    switch (event.code) {
+      case 'NumpadAdd':
+        event.preventDefault();
+        handleAutoScrollSpeed(1);
+        break;
+      case 'NumpadSubtract':
+        event.preventDefault();
+        handleAutoScrollSpeed(-1);
+        break;
+      case 'Numpad0':
+        event.preventDefault();
+        stopAutoScroll();
+        break;
+    }
+  }
+});
+
 // Handle zoom functionality
 function handleZoom(direction) {
   const zoomAmount = direction > 0 ? 1.25 : 0.75;
@@ -359,3 +379,43 @@ function handlePadding(direction) {
   grid.layout();
 }
 
+// Handle auto-scroll speed changes
+function handleAutoScrollSpeed(direction) {
+  autoScrollSpeed += direction * AUTO_SCROLL_INCREMENT;
+  
+  // Update auto-scroll state
+  if (autoScrollSpeed !== 0) {
+    if (!isAutoScrollEnabled) {
+      isAutoScrollEnabled = true;
+      startAutoScroll();
+    }
+  } else {
+    stopAutoScroll();
+  }
+}
+
+// Start auto-scroll animation
+function startAutoScroll() {
+  if (autoScrollAnimationFrame) return;
+  
+  function scroll() {
+    if (!isAutoScrollEnabled || autoScrollSpeed === 0) {
+      stopAutoScroll();
+      return;
+    }
+    window.scrollBy(0, autoScrollSpeed);
+    autoScrollAnimationFrame = requestAnimationFrame(scroll);
+  }
+  
+  autoScrollAnimationFrame = requestAnimationFrame(scroll);
+}
+
+// Stop auto-scroll animation
+function stopAutoScroll() {
+  if (autoScrollAnimationFrame) {
+    cancelAnimationFrame(autoScrollAnimationFrame);
+    autoScrollAnimationFrame = null;
+  }
+  isAutoScrollEnabled = false;
+  autoScrollSpeed = 0;
+}
