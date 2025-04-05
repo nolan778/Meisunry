@@ -26,7 +26,7 @@ function loadData() {
   } catch (error) {
     /* Default json */
     const baseData = {
-      folderLocation: process.platform === 'win32' ? "C:\\" : require('os').homedir(),
+      folderLocation: process.platform === 'win32' ? path.join('C:', path.sep) : require('os').homedir(),
       sortMode: "date",
       recursion: 0,
       loadSpeed: 'medium',
