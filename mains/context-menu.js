@@ -2,6 +2,7 @@ const contextMenu = require('electron-context-menu');
 const { app, clipboard, dialog, shell } = require('electron');
 const fs = require('fs');
 const { loadFolder, saveAppData, loadData, loadIndex, refreshGrid } = require('./main-functions');
+const path = require('path');
 let trash;
 import('trash').then((trashModule) => { trash = trashModule.default || trashModule; });
 
@@ -295,27 +296,42 @@ contextMenu({
     visible: hasImage,
     type: 'checkbox',
     click: async () => {
-      // Action to copy the image path to clipboard
       const imagePath = decodeURIComponent(parameters.srcURL.replace("file:///", "/")); // Get the image source URL
       
-      // Check if the file exists before attempting to delete it
-      fs.access(imagePath, fs.constants.F_OK, async (err) => {
-        if (!err) {
-          try {
-            // Dynamically import trash package
-            const trash = await import('trash');
-            // Move to trash instead of permanent deletion
-            await trash.default(imagePath);
-            console.log("File moved to trash successfully");
-            browserWindow.webContents.send('deleted-file', imagePath);
-          } catch (err) {
-            console.error("Error moving file to trash:", err);
-          }
-        } else {
-          console.error('File does not exist or cannot be accessed');
-          console.log(err);
-        }
+      // Get relative path from the current folder location
+      const relativePath = path.relative(global.preferencesData.folderLocation, imagePath);
+      
+      // Show confirmation dialog
+      const result = await dialog.showMessageBox(browserWindow, {
+        type: 'question',
+        buttons: ['Cancel', 'Delete'],
+        defaultId: 0,
+        title: 'Confirm Delete',
+        message: 'Are you sure you want to move this image to trash?',
+        detail: `File: ${relativePath}`,
       });
+
+      // If user clicked Delete (button index 1)
+      if (result.response === 1) {
+        // Check if the file exists before attempting to delete it
+        fs.access(imagePath, fs.constants.F_OK, async (err) => {
+          if (!err) {
+            try {
+              // Dynamically import trash package
+              const trash = await import('trash');
+              // Move to trash instead of permanent deletion
+              await trash.default(imagePath);
+              console.log("File moved to trash successfully");
+              browserWindow.webContents.send('deleted-file', imagePath);
+            } catch (err) {
+              console.error("Error moving file to trash:", err);
+            }
+          } else {
+            console.error('File does not exist or cannot be accessed');
+            console.log(err);
+          }
+        });
+      }
     }
   },
   {
