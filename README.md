@@ -11,8 +11,22 @@ This is where <b>Meisunry</b> comes in. Choose a folder and look at your images 
 
 <b>Left click:</b> Make target image fullscreen <br>
 <b>Right click:</b> Sorting options, recursion depth, and folder selection<br>
-<b>Ctrl + Mouse wheel:</b> Zoom in/out<br>
-<b>Shift + Mouse wheel:</b> Padding control<br>
+
+### Zoom In/Out
+* Ctrl + Mouse wheel
+* Ctrl + Num+/-
+
+### Padding Control
+* Shift + Mouse wheel
+* Shift + Num+/-
+
+### Auto-Scroll Speed
+* Alt + Mouse wheel
+* Alt + Num+/-
+
+### Auto-Scroll Stop
+* Middle Click
+* Alt + Num0
 
 ## Adding Meisunry to file explorer context menu
 
