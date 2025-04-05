@@ -56,8 +56,6 @@ window.electronAPI.onSortUpdate((event, value) => {
 })
 
 window.electronAPI.onFileDeleted((event, deletedFilePath) => {
-  /* Fix file path */
-  deletedFilePath = deletedFilePath.replace(/\//g, '\\');
   /* Update image count on topbar */
   updateHeaderCounter();
   // Rm from grid

@@ -37,6 +37,11 @@
     "win": {
       "icon": "/app-icons/logo.ico"
     },
+    "linux": {
+      "icon": "/app-icons/logo.png",
+      "target": ["AppImage", "deb"],
+      "category": "Graphics"
+    },
     "asar": false
   }
 }

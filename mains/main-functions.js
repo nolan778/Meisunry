@@ -18,11 +18,15 @@ function loadData() {
   try {
     const fileContents = fs.readFileSync(dataFilePath, 'utf-8');
     const loadedData = JSON.parse(fileContents);
+    // Ensure the folder location uses the correct path separator
+    if (loadedData.folderLocation) {
+      loadedData.folderLocation = path.normalize(loadedData.folderLocation);
+    }
     return loadedData;
   } catch (error) {
     /* Default json */
     const baseData = {
-      folderLocation: "C:\\",
+      folderLocation: process.platform === 'win32' ? "C:\\" : require('os').homedir(),
       sortMode: "date",
       recursion: 0,
       loadSpeed: 'medium',
@@ -37,32 +41,27 @@ function loadData() {
 /* Load a folder from a path, save to preferencesData on disk, and refresh browser window */
 function loadFolder (browserWindow, selectedFolderPath) {
   console.log('Selected folder:', selectedFolderPath);
-  global.preferencesData.folderLocation = selectedFolderPath;
+  // Normalize the path to use correct separators
+  global.preferencesData.folderLocation = path.normalize(selectedFolderPath);
   saveAppData();
   loadIndex(browserWindow);
 }
 
 function truncateFilePathToNearestFolder(filePath) {
-  const lastDotIndex = filePath.lastIndexOf('.');
+  if (filePath === `./mains/main.js` || filePath.toLowerCase().includes("meisunry")) {
+    return global.preferencesData.folderLocation;
+  }
+
+  // Use path.parse to handle paths in a platform-agnostic way
+  const parsed = path.parse(filePath);
   
-  if (filePath === `./mains/main.js` || filePath.toLowerCase().includes("meisunry")) return global.preferencesData.folderLocation;
-  
-  if (lastDotIndex !== -1) {
-    // If a dot (.) is found (indicating a file extension),
-    // find the last directory separator (slash or backslash)
-    const lastSeparatorIndex = filePath.lastIndexOf('/');
-    if (lastSeparatorIndex === -1) {
-      const lastBackslashIndex = filePath.lastIndexOf('\\');
-      if (lastBackslashIndex !== -1) {
-        return filePath.substring(0, lastBackslashIndex + 1);
-      }
-    } else {
-      return filePath.substring(0, lastSeparatorIndex + 1);
-    }
+  // If it's a file (has an extension), return its directory
+  if (parsed.ext) {
+    return parsed.dir + path.sep;
   }
   
-  // If no file extension or directory separators are found, return the original path
-  return filePath;
+  // If it's already a directory, return it with trailing separator
+  return filePath + (filePath.endsWith(path.sep) ? '' : path.sep);
 }
 
 function loadIndex(browserWindow) {

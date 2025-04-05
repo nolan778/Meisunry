@@ -4,14 +4,33 @@
  * @returns {string} filePath with special characters escaped
 */
 function encodeFilePath(filePath) {
-  let escapedPath = "file:///" + filePath.replace(/^file:\/\//, '') // Ensure prefix 'file:///'
-    .replace(/\\/g, '/') // Replace backslashes with forward slashes
-    .split('/').map(encodeURIComponent).join('/') // Encode each part of the path
-    .replace(
-      /[!~*'()]/g,
-      (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
-    ) // Encode characters that are not encoded by encodeURIComponent
-  return escapedPath;
+  // Remove any existing file:// prefix
+  let cleanPath = filePath.replace(/^file:\/\//, '');
+  
+  // For Windows paths starting with a drive letter, add an extra / after file:///
+  const isWindowsPath = /^[A-Za-z]:\\/.test(cleanPath);
+  
+  // Ensure all slashes are forward slashes
+  cleanPath = cleanPath.replace(/\\/g, '/');
+  
+  // For non-Windows paths or paths without drive letter, remove leading slash
+  if (!isWindowsPath && cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.substring(1);
+  }
+  
+  // Encode the path components
+  let encodedPath = cleanPath.split('/').map(encodeURIComponent).join('/');
+  
+  // Add the file:// prefix with appropriate number of slashes
+  encodedPath = `file:///${encodedPath}`;
+  
+  // Encode additional special characters
+  encodedPath = encodedPath.replace(
+    /[!~*'()]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+  );
+  
+  return encodedPath;
 }
 
 

@@ -92,9 +92,8 @@ app.whenReady().then(() => {
       if (err) {
         console.error(`The path ${arg} does not exist.`);
       } else {
-        // Convert to the desired format for json serialization
-        const convertedPath = arg.replace(/\//g, '\\');
-        global.preferencesData.folderLocation = convertedPath;
+        // Use platform-agnostic path handling
+        global.preferencesData.folderLocation = arg;
         saveAppData();
       }
     });
