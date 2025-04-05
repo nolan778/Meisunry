@@ -312,3 +312,50 @@ function is_an_image_focused() {
   return focusImg.classList.contains('show');
 }
 
+// Add keyboard event listeners for zoom and padding control
+document.addEventListener('keydown', (event) => {
+  // Check if Ctrl key is pressed
+  if (event.ctrlKey) {
+    // Numpad + and - for zoom
+    if (event.code === 'NumpadAdd') {
+      event.preventDefault();
+      handleZoom(1); // Zoom in
+    } else if (event.code === 'NumpadSubtract') {
+      event.preventDefault();
+      handleZoom(-1); // Zoom out
+    }
+  }
+  
+  // Check if Shift key is pressed
+  if (event.shiftKey) {
+    // Numpad + and - for padding
+    if (event.code === 'NumpadAdd') {
+      event.preventDefault();
+      handlePadding(1); // Increase padding
+    } else if (event.code === 'NumpadSubtract') {
+      event.preventDefault();
+      handlePadding(-1); // Decrease padding
+    }
+  }
+});
+
+// Handle zoom functionality
+function handleZoom(direction) {
+  const zoomAmount = direction > 0 ? 1.25 : 0.75;
+  currentZoom *= zoomAmount;
+  currentZoom = Math.max(currentZoom, 0.1);
+  updateGridAndSpacing();
+  // Trigger Masonry Layout's layout after changing the CSS property
+  grid.layout();
+}
+
+// Handle padding functionality
+function handlePadding(direction) {
+  const paddingAmount = direction > 0 ? -0.1 : 0.1;
+  currentPadding += paddingAmount;
+  currentPadding = Math.max(Math.min(currentPadding, 1), 0.25);
+  updateGridAndSpacing();
+  // Trigger Masonry Layout's layout after changing the CSS property
+  grid.layout();
+}
+
